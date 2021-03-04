@@ -1,49 +1,62 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import Content from './components/Content';
-import { useState } from 'react';
+import Form from './components/Form';
+import data from './mock/data';
 
 function App() {
-  const [list, setList] = useState([
-    {
-      id: 1,
-      task: 'Requirement',
-      status: 'DONE',
-      dueDate: new Date('10-13-2020')
-    },
-    {
-      id: 2,
-      task: 'Wireframe',
-      status: 'DOING',
-      dueDate: new Date('10-16-2020')
-    },
-    {
-      id: 3,
-      task: 'Prototype',
-      status: 'DOING',
-      dueDate: new Date('10-18-2020')
-    }
-  ]);
-  const [nextId, setNextId] = useState(4);
-  const [listForm, setListForm] = useState({ isEdit: false, list: null });
-
-  const addList = (list) => {
-    setList(value => [...value, { ...list, id: nextId, status: 'TO_DO' }]);
+  const [list, setList] = useState(data);
+  const [nextId, setNextId] = useState(data.length + 1);
+  const [targetList, setTargetList] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  console.log(searchTerm);
+  const addList = newList => {
+    setList(value => [
+      ...value,
+      { ...newList, id: nextId, status: 'TO_DO' }
+    ]);
     setNextId(value => value + 1);
+    setTargetList(null);
   };
 
-  const deleteList = (id) => {
+  const deleteList = id => {
     setList(value => value.filter(item => item.id !== id));
   };
 
-  const updateList = (list) => {
-    setList(value => value.map(item => item.id === list.id ? list : item));
+  const updateList = updatedList => {
+    setList(value =>
+      value.map(item =>
+        item.id === updatedList.id
+          ? { ...item, ...updatedList }
+          : item
+      )
+    );
+    setTargetList(null);
   };
 
   return (
     <div className="container-fluid px-0">
-      <Navbar addList={addList} listForm={listForm} />
-      <Content list={list} deleteList={deleteList} updateList={updateList} />
+      <Navbar
+        setTargetList={setTargetList}
+        setSearchTerm={setSearchTerm}
+      />
+      {!targetList && (
+        <Content
+          list={list}
+          setTargetList={setTargetList}
+          updateList={updateList}
+          deleteList={deleteList}
+          searchTerm={searchTerm}
+        />
+      )}
+      {targetList && (
+        <Form
+          targetList={targetList}
+          setTargetList={setTargetList}
+          addList={addList}
+          updateList={updateList}
+        />
+      )}
     </div>
   );
 }

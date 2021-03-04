@@ -1,3 +1,7 @@
-body {  
-  background-color: #E4EBFF;
+body {
+  background-color: #e4ebff;
+}
+
+.react-datepicker-wrapper {
+  display: block;
 }
